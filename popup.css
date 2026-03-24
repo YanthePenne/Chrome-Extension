@@ -1,0 +1,83 @@
+:root {
+  --primary: #2563eb;
+  --bg: #f8fafc;
+  --text: #1e293b;
+  --border: #e2e8f0;
+}
+
+body {
+  width: 320px;
+  margin: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+.container {
+  padding: 20px;
+}
+
+h1 {
+  font-size: 1.2rem;
+  margin: 0 0 4px 0;
+}
+
+p {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0 0 20px 0;
+}
+
+.drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 10px;
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.drop-zone:hover {
+  border-color: var(--primary);
+  background: #eff6ff;
+}
+
+.icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.file-info {
+  margin-top: 15px;
+  font-size: 0.8rem;
+  text-align: center;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.result-card {
+  margin-top: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  border-left: 4px solid var(--primary);
+}
+
+.result-card small {
+  display: block;
+  color: #64748b;
+  margin-bottom: 5px;
+}
+
+#resultValue {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.hidden {
+  display: none;
+}
