@@ -1,3 +1,4 @@
+// This script is intended to run in a Chrome extension context
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "PROCESS_FILE") {
     const result = performHeavyCalculation(message.data);

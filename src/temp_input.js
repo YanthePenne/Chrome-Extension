@@ -4,10 +4,12 @@
 
 // Usage:
 const rowId = getRowIdByArtNr("21517");
-const inputId = getInputIdByRowId(rowId);
+const inputElement = getInputElementByRowId(rowId);
+const checkboxElement = getCheckboxByRowId(rowId);
 console.log("Found ID:", rowId);
-console.log("found ID:", inputId);
-inputOrder(inputId, 12);
+console.log("found ID:", inputElement);
+console.log("found ID:", checkboxElement);
+inputOrder(inputElement, checkboxElement, 12);
 
 function getRowIdByArtNr(article_number) {
   // The XPath: find the TR where the first TD has our text
@@ -24,16 +26,25 @@ function getRowIdByArtNr(article_number) {
   return result ? result.id : "Row not found";
 }
 
-function getInputIdByRowId(rowId) {
+function getInputElementByRowId(rowId) {
   // Find the input specifically INSIDE that row
-  const inputID = document.querySelector(`#${rowId} input`).id;
-  return inputID ? inputID : null;
+  // only works because specific inputElement I need is the first.
+  const inputElement = document.querySelector(`#${rowId} input`);
+  return inputElement ? inputElement : null;
 }
 
-function inputOrder(input_id, value) {
-  const input = document.getElementById(input_id);
+function getCheckboxByRowId(rowId) {
+  // Find the checkbox specifically INSIDE that row
+  const checkbox = document.querySelector(`#${rowId} input[type="checkbox"]`);
+
+  return checkboxElement ? checkboxElement : null;
+}
+
+function inputOrder(input, checkbox, value) {
+  checkbox.checked = true; // Check the box first
   input.value = value;
 
   // Trigger input immediately
   input.dispatchEvent(new Event("input", { bubbles: true }));
+  checkbox.click();
 }
