@@ -8,5 +8,8 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["storage"]
+  "permissions": ["storage"],
+  "devDependencies": {
+    "@types/chrome": "0.1.38"
+  }
 }
