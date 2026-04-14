@@ -3,7 +3,7 @@
   "name": "File Processor",
   "version": "1.0",
   "action": {
-    "default_popup": "hello.html"
+    "default_popup": "index. html"
   },
   "background": {
     "service_worker": "background.js"
