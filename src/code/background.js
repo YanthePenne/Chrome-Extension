@@ -3,12 +3,19 @@
 // local function variables = camelcase
 // Data Strcutures and Classes
 
+// Ensure chrome API is available (for extension context)
+if (typeof chrome === "undefined") {
+  console.warn(
+    "Chrome API is not available. Ensure this script runs as a Chrome extension background script.",
+  );
+}
+
 class order {
-  constructor(articleNumber, orderAmount, checkbox, inputted) {
-    this.articleNumber = articleNumber;
-    this.orderAmount = orderAmount;
-    this.checkbox = checkbox;
-    this.inputted = inputted;
+  constructor(articleNumber, orderAmount, checked, inputted) {
+    const rowID = getRowIdByArtNr(articleNumber);
+    const inputElement = getInputElementByRowId(rowID);
+    const checkbox = getCheckboxByRowId(rowID);
+    const websiteAmount = this.getWebsiteAmount(orderAmount, inputElement);
   }
 
   /**
@@ -16,7 +23,11 @@ class order {
    * @param {Object} params - An object containing parameters for the query, such as filters or criteria.
    * @returns {number} The total amount of websites matching the parameters.
    */
-  getWebsiteAmount(params) {}
+  getWebsiteAmount(params) {
+    //round to the nearest whole number
+
+    return this.websiteAmount;
+  }
 
   /**
    * Returns the current order amount.
@@ -49,16 +60,11 @@ class order {
    */
   inputOrder(params) {
     try {
-      websiteOrderInput(
-        params.articleNumber,
-        params.checkbox,
-        params.articleAmount,
-      );
+      const websiteAmount = this.getWebsiteAmount(params);
+
+      websiteOrderInput(this.inputElement, this.checkbox, params.articleAmount);
     } catch (error) {
-      console.error(
-        "Error inputting order -> adding to exception list",
-        exceptionList(),
-      );
+      console.error("Error inputting order -> adding to exception list");
     }
   }
 }
@@ -73,26 +79,18 @@ class orderList {
   }
 }
 
+// scope of these variables do they need to be global? can they be local to the function that uses them? if they need to be global, should they be in an object to avoid polluting the global namespace?
 const inputList = new orderList();
+const outputList = new orderList();
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "PROCESS_FILE") {
     try {
       const parsedData = parseCSV(message.data);
       const dataWithoutHeader = parsedData.slice(1); // Remove header row if present
-      const result = performHeavyCalculation(dataWithoutHeader);
 
-      const articleNumberIndex = parsedData[0].indexOf("Product_Reference2"); // "" name of column header in excel
-      const articleAmountIndex = parsedData[0].indexOf("Line_QTY");
-
-      dataWithoutHeader.forEach((row) => {
-        const articleNumber = row[articleNumberIndex]; // Assuming article number is in the 16th column
-        const articleAmount = row[articleAmountIndex];
-
-        const orderInstance = new order(articleNumber, articleAmount, true);
-        inputList.addOrder(orderInstance);
-        orderInstance.inputOrder();
-      });
+      console.log("processing csv");
+      procesCSV(parsedData, dataWithoutHeader);
 
       // Return result to popup
       sendResponse({
@@ -190,10 +188,30 @@ function parseCSV(csvText) {
  * @param {Array} data - The input data array to be processed.
  * @returns {number} The count of rows processed, excluding the header row. Returns 0 if data is empty.
  */
-function performHeavyCalculation(data) {
-  if (data.length === 0) return 0;
-  // Example: Count rows excluding header
-  const rowCount = data.length - 1;
-  console.log(`Processed ${rowCount} rows.`);
-  return rowCount;
+
+/**
+ * Processes CSV data and creates order instances for each row.
+ * @param {string[][]} parsedData - A 2D array where the first row contains column headers
+ * @param {string[][]} dataWithoutHeader - A 2D array containing CSV data rows without the header
+ * @returns {void}
+ * @description Extracts article numbers and quantities from the CSV data,
+ * creates new order instances, adds them to the input list, and processes each order.
+ */
+function procesCSV(parsedData) {
+  // normalize data
+
+  const headers = parsedData[0];
+  const artNrIndex = headers.indexOf("Product_Reference2"); // Matches "24232"
+  const qtyIndex = headers.indexOf("Line_QTY");
+
+  // Skip header and send each row to the Content Script
+  parsedData.slice(1).forEach((row) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        action: "FILL_ROW",
+        articleNumber: row[artNrIndex],
+        quantity: row[qtyIndex],
+      });
+    });
+  });
 }

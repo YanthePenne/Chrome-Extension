@@ -3,13 +3,16 @@
   "name": "File Processor",
   "version": "1.0",
   "action": {
-    "default_popup": "index. html"
+    "default_popup": "index.html"
   },
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["storage"],
-  "devDependencies": {
-    "@types/chrome": "0.1.38"
-  }
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "permissions": ["storage"]
 }
