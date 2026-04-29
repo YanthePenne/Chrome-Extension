@@ -23,7 +23,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // output should be a csv that includes if the order was successfully inputted or not, if not, the csv should include the article number and quantity that failed to be inputted
       sendResponse({
         success: true,
-        calculation: dataWithoutHeader[0][1] || "No data",
       });
     } catch (error) {
       sendResponse({ success: false, error: error.message });

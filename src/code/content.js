@@ -33,6 +33,15 @@ if (typeof chrome === "undefined") {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "FILL_ROW") {
+    const outputList = [
+      [
+        "Article Number",
+        "Article Name",
+        "Requested Quantity",
+        "Website Quantity",
+        "Status",
+      ],
+    ]; // Initialize with headers
     const { parsedData } = request;
     const headers = parsedData[0]; // Assuming first row is headers
     const artNrIndex = headers.indexOf("Product_Reference2"); // Matches "24232"
@@ -49,22 +58,44 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // 2. Find the elements inside that specific row
         const inputField = getInputElementByRowId(rowId);
         const checkbox = getCheckboxByRowId(rowId);
+        const articleName = getArticleNameByRowID(rowId);
 
         // 3. Perform the automation
         if (inputField && checkbox) {
           const websiteQuantity = getWebsiteQuantity(quantity, rowId);
           websiteOrderInput(inputField, checkbox, websiteQuantity);
+          outputList.push([
+            articleNumber,
+            articleName,
+            quantity,
+            websiteQuantity,
+            "Successvol ingevuld",
+          ]);
           console.log(`Successfully filled Article: ${articleNumber}`);
         } else {
+          const element = document.querySelector(
+            `#${rowId} td.col-add-to-cart`,
+          );
+          const text = element.innerText;
+          outputList.push([articleNumber, articleName, quantity, "N/A", text]);
           console.warn(
             `Article currently unavailable for ordering: ${articleNumber}.`,
           );
         }
       } else {
         //TODO add to list
+        outputList.push([
+          articleNumber,
+          "N/A",
+          quantity,
+          "N/A",
+          "Niet gevonden op de deze website",
+        ]);
         console.warn(`Article ${articleNumber} not found on this page.`);
       }
     });
+    exportOrdersToExcel(outputList);
+    sendResponse({ success: true });
   }
 });
 
@@ -93,6 +124,11 @@ function getRowIdByArtNr(article_number) {
  */
 function getInputElementByRowId(rowId) {
   return document.querySelector(`#${rowId} input`);
+}
+
+function getArticleNameByRowID(rowId) {
+  const element = document.querySelector(`#${rowId} .single-product-link`);
+  return element ? element.innerText.trim() : null;
 }
 
 /**
@@ -158,4 +194,28 @@ function websiteOrderInput(input, checkbox, value) {
 
   // Final safety sync
   checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+/**
+ * Processes an array of arrays and triggers an .xlsx download
+ */
+function exportOrdersToExcel(dataArray, filename = "Order_Results.xlsx") {
+  try {
+    // 1. Create a new empty Workbook
+    const workbook = XLSX.utils.book_new();
+
+    // 2. Convert your Array of Arrays into a Worksheet
+    // Example format: [ ["Header1", "Header2"], ["Row1Col1", "Row1Col2"] ]
+    const worksheet = XLSX.utils.aoa_to_sheet(dataArray);
+
+    // 3. Attach the Worksheet to the Workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Processed Orders");
+
+    // 4. Generate the file and trigger the browser download
+    XLSX.writeFile(workbook, filename);
+
+    console.log("Excel file generated successfully.");
+  } catch (error) {
+    console.error("Failed to generate Excel:", error);
+  }
 }

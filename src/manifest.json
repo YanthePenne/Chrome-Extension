@@ -3,15 +3,15 @@
   "name": "File Processor",
   "version": "1.0",
   "action": {
-    "default_popup": "index.html"
+    "default_popup": "code/index.html"
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "code/background.js"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["libs/xlsx.full.min.js", "content.js"]
+      "js": ["libs/xlsx.full.min.js", "code/content.js"]
     }
   ],
   "permissions": ["storage"]
