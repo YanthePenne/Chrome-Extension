@@ -1,3 +1,10 @@
+// Ensure chrome API is available (for extension context)
+if (typeof chrome === "undefined") {
+  console.warn(
+    "Chrome API is not available. Ensure this script runs as a Chrome extension background script.",
+  );
+}
+
 const fileInput = document.getElementById("fileInput");
 const fileName = document.getElementById("fileName");
 const fileInfo = document.getElementById("fileInfo");
