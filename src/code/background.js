@@ -44,12 +44,58 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
  * const result = parseCSV(csv);
  * // Returns: [["name", "age"], ["John", "30"], ["Jane", "25"]]
  */
+// function parseCSV(csvText) {
+//   // Simple robust parser for comma-separated values
+//   const lines = csvText.split(/\r?\n/);
+//   return lines
+//     .filter((line) => line.trim() !== "")
+//     .map((line) => line.split(";").map((cell) => cell.trim()));
+// }
+
+//new parseCSV function that also removes the UTF-8 BOM character and handles quoted values with semicolons inside them
+/**
+ * Parses a CSV formatted string into a 2D array of cells.
+ *
+ * @param {string} csvText - The CSV text to parse. May include a UTF-8 BOM character.
+ * @returns {string[][]} A 2D array where each inner array represents a row of cells.
+ *
+ * @description
+ * - Removes UTF-8 BOM character if present at the start
+ * - Splits text by line breaks (both \n and \r\n)
+ * - Filters out empty lines
+ * - Splits each line by semicolons
+ * - Trims whitespace from each cell
+ * - Removes surrounding double quotes from cells
+ * - Removes surrounding brackets from cells
+ *
+ * @example
+ * const csv = 'name;age\n"John";30\n"Jane";25';
+ * const result = parseCSV(csv);
+ * Returns: [['name', 'age'], ['John', '30'], ['Jane', '25']]
+ */
 function parseCSV(csvText) {
-  // Simple robust parser for comma-separated values
-  const lines = csvText.split(/\r?\n/);
+  const cleanText = csvText.startsWith("\ufeff") ? csvText.slice(1) : csvText;
+  const lines = cleanText.split(/\r?\n/);
+
   return lines
     .filter((line) => line.trim() !== "")
-    .map((line) => line.split(";").map((cell) => cell.trim()));
+    .map((line) => {
+      return line.split(";").map((cell) => {
+        let trimmed = cell.trim();
+
+        // Remove surrounding double quotes if they exist
+        if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+          trimmed = trimmed.slice(1, -1);
+        }
+
+        // Remove surrounding brackets if your specific file uses them
+        if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+          trimmed = trimmed.slice(1, -1);
+        }
+
+        return trimmed;
+      });
+    });
 }
 /**
  * Performs a heavy calculation on the provided data.

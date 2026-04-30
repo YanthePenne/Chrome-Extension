@@ -39,6 +39,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         "Article Name",
         "Requested Quantity",
         "Website Quantity",
+        "Unit Amount",
         "Status",
       ],
     ]; // Initialize with headers
@@ -49,7 +50,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     parsedData.slice(1).forEach((row) => {
       const articleNumber = row[artNrIndex];
-      const quantity = row[qtyIndex];
+      const quantity = Math.round(parseFloat(row[qtyIndex]));
 
       // 1. Get the Row ID using XPath
       const rowId = getRowIdByArtNr(articleNumber);
@@ -62,6 +63,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         // 3. Perform the automation
         if (inputField && checkbox) {
+          const unitAmount = getUnitAmountByRowId(rowId);
           const websiteQuantity = getWebsiteQuantity(quantity, rowId);
           websiteOrderInput(inputField, checkbox, websiteQuantity);
           outputList.push([
@@ -69,6 +71,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             articleName,
             quantity,
             websiteQuantity,
+            unitAmount,
             "Successvol ingevuld",
           ]);
           console.log(`Successfully filled Article: ${articleNumber}`);
@@ -77,7 +80,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             `#${rowId} td.col-add-to-cart`,
           );
           const text = element.innerText;
-          outputList.push([articleNumber, articleName, quantity, "N/A", text]);
+          outputList.push([
+            articleNumber,
+            articleName,
+            quantity,
+            "N/A",
+            "N/A",
+            text,
+          ]);
           console.warn(
             `Article currently unavailable for ordering: ${articleNumber}.`,
           );
@@ -88,6 +98,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           articleNumber,
           "N/A",
           quantity,
+          "N/A",
           "N/A",
           "Niet gevonden op de deze website",
         ]);
@@ -152,7 +163,7 @@ function getUnitAmountByRowId(rowId) {
   const unitAmountElement = document.querySelector(
     `#${rowId} .consumer-units-count`,
   );
-  return unitAmountElement ? unitAmountElement.textContent.trim() : null;
+  return unitAmountElement ? unitAmountElement.textContent.trim() : 1;
 }
 
 /**
