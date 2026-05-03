@@ -37,6 +37,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       [
         "Article Number",
         "Article Name",
+        "Houdbaarheidsdatum",
         "Requested Quantity",
         "Website Quantity",
         "Unit Amount",
@@ -65,10 +66,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (inputField && checkbox) {
           const unitAmount = getUnitAmountByRowId(rowId);
           const websiteQuantity = getWebsiteQuantity(quantity, rowId);
+          const tht = getTHTByRowId(rowId);
           websiteOrderInput(inputField, checkbox, websiteQuantity);
           outputList.push([
             articleNumber,
             articleName,
+            tht,
             quantity,
             websiteQuantity,
             unitAmount,
@@ -83,6 +86,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           outputList.push([
             articleNumber,
             articleName,
+            "N/A",
             quantity,
             "N/A",
             "N/A",
@@ -96,6 +100,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         //TODO add to list
         outputList.push([
           articleNumber,
+          "N/A",
           "N/A",
           quantity,
           "N/A",
@@ -164,6 +169,13 @@ function getUnitAmountByRowId(rowId) {
     `#${rowId} .consumer-units-count`,
   );
   return unitAmountElement ? unitAmountElement.textContent.trim() : 1;
+}
+
+function getTHTByRowId(rowId) {
+  const thtElement = document.querySelector(`#${rowId} .tht.d-block`);
+  return thtElement
+    ? thtElement.textContent.trim()
+    : "Geen houdbaarheidsdatum gevonden";
 }
 
 /**
