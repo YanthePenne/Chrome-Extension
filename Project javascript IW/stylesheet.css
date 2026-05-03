@@ -1,0 +1,116 @@
+table {
+    float: left;
+    border: solid 1px black;
+}
+
+.table1 {
+    position: fixed;
+    margin-top: 100px;
+    margin-left: 1%;
+}
+
+.table2 {
+    position: fixed;
+    margin-top: 100px;
+    margin-left: 62%;
+    border: solid 1px yellow;
+}
+
+.button {
+    font-size: 30px;
+    font-weight: bold;
+    border: 3px black solid;
+    padding: 1em 13px;
+    border-radius: 80px;
+    box-sizing: inherit;
+    position: fixed;
+    margin-top: 100px;
+    margin-left: 44.5%;
+}
+
+.label {
+    font-size: 50px;
+    position: fixed;
+    margin-top: 300px;
+    margin-left: 46.5%;
+}
+
+.CPU {
+    font-family: sans-serif;
+    position: fixed;
+    margin-top: 50px;
+    margin-left: 78.5%;
+}
+
+.PLAYER {
+    font-family: sans-serif;
+    position: fixed;
+    margin-top: 50px;
+    margin-left: 15.5%;
+}
+
+th {
+    font-family: sans-serif;
+    font-size: 20px;
+    border: solid 1px;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    margin-right: auto;
+    margin-left: auto
+}
+
+td {
+    font-family: sans-serif;
+    font-size: 20px;
+    border: solid 1px;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    margin-right: auto;
+    margin-left: auto
+}
+
+.playerBoat {
+    background-color: #696969;
+}
+
+.hitCPU {
+    background-color: green;
+    border: solid 1px;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    margin-right: auto;
+    margin-left: auto
+}
+
+.fullyhitCPU {
+    background-color: #696969;
+    border: solid 1px;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    margin-right: auto;
+    margin-left: auto
+}
+
+.hitPlayer {
+    background-color: red;
+    border: solid 1px;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    margin-right: auto;
+    margin-left: auto
+}
+
+.fullyhitPlayer {
+    background-color: black;
+    border: solid 1px;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    margin-right: auto;
+    margin-left: auto
+}
