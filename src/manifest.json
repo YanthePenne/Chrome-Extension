@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "OnlineFill Oxfarm",
-  "version": "1.0",
+  "version": "2.0",
   "icons": {
     "16": "images/green_ribbon.png",
     "32": "images/green_ribbon.png",
