@@ -5,32 +5,18 @@ if (typeof chrome === "undefined") {
   );
 }
 
-// I do not think below code is actually used anywhere lol
-// /* global chrome */
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//   let notFound = [];
-
-//   request.data.forEach((row) => {
-//     // You must map 'row.selector' to the specific CSS selector in your CSV
-//     const targetElement = document.querySelector(row.selector);
-
-//     if (targetElement) {
-//       targetElement.value = row.value;
-
-//       // CRITICAL: Trigger events so the website's JavaScript notices the change
-//       targetElement.dispatchEvent(new Event("input", { bubbles: true }));
-//       targetElement.dispatchEvent(new Event("change", { bubbles: true }));
-//     } else {
-//       // Keep track of rows that couldn't be filled
-//       notFound.push(row);
-//     }
-//   });
-
-//   // Send the list of failed items back to popup.js for CSV generation
-//   sendResponse({ notFound: notFound });
-//   return true;
-// });
-
+/**
+ * Handles messages from the extension and automates the order filling process.
+ * Processes parsed data containing article information, retrieves corresponding rows,
+ * fills in quantities, and exports the results to an Excel file.
+ *
+ * @param {Object} request - The message request object
+ * @param {string} request.action - The action type (e.g., "FILL_ROW")
+ * @param {Array<Array<string|number>>} request.parsedData - 2D array of parsed data with headers in first row
+ * @param {Object} sender - The sender of the message
+ * @param {Function} sendResponse - Callback function to send a response back to the sender
+ * @returns {void}
+ */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "FILL_ROW") {
     const outputList = [
@@ -114,7 +100,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({ success: true });
   }
 });
-
 /**
  * Retrieves the ID of a table row by matching the article number in the first column.
  * @param {string} article_number - The article number to search for in the first column of table rows
@@ -131,7 +116,6 @@ function getRowIdByArtNr(article_number) {
   ).singleNodeValue;
   return result ? result.id : "Row not found";
 }
-
 /**
  * Retrieves the input element within the element identified by the given row ID.
  *
@@ -141,12 +125,15 @@ function getRowIdByArtNr(article_number) {
 function getInputElementByRowId(rowId) {
   return document.querySelector(`#${rowId} input`);
 }
-
+/**
+ * Retrieves the article name from a DOM element identified by row ID.
+ * @param {string} rowId - The ID of the row element containing the article link.
+ * @returns {string|null} The trimmed text content of the article link, or null if the element is not found.
+ */
 function getArticleNameByRowID(rowId) {
   const element = document.querySelector(`#${rowId} .single-product-link`);
   return element ? element.innerText.trim() : null;
 }
-
 /**
  * Retrieves the checkbox input element within a row specified by its ID.
  *
@@ -156,7 +143,6 @@ function getArticleNameByRowID(rowId) {
 function getCheckboxByRowId(rowId) {
   return document.querySelector(`#${rowId} input[type="checkbox"]`);
 }
-
 /**
  * Retrieves the unit amount text content for a given row by its ID.
  *
@@ -170,14 +156,17 @@ function getUnitAmountByRowId(rowId) {
   );
   return unitAmountElement ? unitAmountElement.textContent.trim() : 1;
 }
-
+/**
+ * Retrieves the shelf life date (THT) for a given row element.
+ * @param {string} rowId - The ID of the row element containing the shelf life date.
+ * @returns {string} The trimmed text content of the shelf life date element, or a default message if not found.
+ */
 function getTHTByRowId(rowId) {
   const thtElement = document.querySelector(`#${rowId} .tht.d-block`);
   return thtElement
     ? thtElement.textContent.trim()
     : "Geen houdbaarheidsdatum gevonden";
 }
-
 /**
  * Calculates the website quantity based on the provided quantity and row ID.
  *
@@ -190,7 +179,6 @@ function getWebsiteQuantity(quantity, rowID) {
   const websiteAmount = Math.ceil(quantity / unitAmount);
   return String(websiteAmount); // Return the calculated website quantity
 }
-
 /**
  * Updates the value of an input field by adding a specified value, checks a checkbox if not already checked,
  * and dispatches relevant events to ensure site logic is triggered.
@@ -218,7 +206,6 @@ function websiteOrderInput(input, checkbox, value) {
   // Final safety sync
   checkbox.dispatchEvent(new Event("change", { bubbles: true }));
 }
-
 /**
  * Processes an array of arrays and triggers an .xlsx download
  */
