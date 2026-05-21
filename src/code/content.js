@@ -202,6 +202,8 @@ function websiteOrderInput(input, checkbox, value) {
 
   // Trigger events
   input.dispatchEvent(new Event("input", { bubbles: true }));
+  input.dispatchEvent(new Event("change", { bubbles: true }));
+  input.dispatchEvent(new Event("blur", { bubbles: true }));
 
   // Final safety sync
   checkbox.dispatchEvent(new Event("change", { bubbles: true }));
